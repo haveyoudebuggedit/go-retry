@@ -40,11 +40,11 @@ func New(
 		}
 	}
 	return &retrier{
-		logger: logger,
-		wrapFunc: wrapFunc,
+		logger:             logger,
+		wrapFunc:           wrapFunc,
 		defaultClassifiers: defaultClassifiers,
-		defaultBackoff: defaultBackoff,
-		defaultTimeout: defaultTimeout,
+		defaultBackoff:     defaultBackoff,
+		defaultTimeout:     defaultTimeout,
 	}
 }
 

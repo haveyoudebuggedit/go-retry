@@ -36,19 +36,19 @@ type StrategyInstance interface {
 func NewStrategy(
 	factory func() StrategyInstance,
 	canClassifyErrors bool,
-	canWait           bool,
-	canTimeout        bool,
+	canWait bool,
+	canTimeout bool,
 ) Strategy {
 	return &strategy{
-		factory: factory,
+		factory:           factory,
 		canClassifyErrors: canClassifyErrors,
-		canWait: canWait,
-		canTimeout: canTimeout,
+		canWait:           canWait,
+		canTimeout:        canTimeout,
 	}
 }
 
 type strategy struct {
-	factory func() StrategyInstance
+	factory           func() StrategyInstance
 	canClassifyErrors bool
 	canWait           bool
 	canTimeout        bool
@@ -69,4 +69,3 @@ func (s *strategy) CanWait() bool {
 func (s *strategy) CanTimeout() bool {
 	return s.canTimeout
 }
-
