@@ -16,12 +16,12 @@ The simplest usage is calling `retry.Retry()` as follows:
 
 ```go
 if err := retry.Retry(
-	"creating foo",
-	func createFoo() error {
+    "creating foo",
+    func createFoo() error {
         return fmt.Errorf("creating foo failed")
     },
 ); err != nil {
-	panic(err)
+    panic(err)
 }
 ```
 
@@ -55,11 +55,11 @@ You can customize the retry behavior by passing retry strategies to the `retry.R
 
 ```go
 retry.Retry(
-	action,
-	call,
-	strategy1,
-	strategy2,
-	strategy3
+    action,
+    call,
+    strategy1,
+    strategy2,
+    strategy3
 )
 ```
 
@@ -107,12 +107,12 @@ These values are used to add default strategies as described above.
 
 ```go
 func MyStrategy() retry.Strategy {
-	canClassify := true
-	canWait := false
-	canTimeout := false
-	return retry.NewStrategy(
-		func() retry.StrategyInstance {
-            return &yourStrategyInstance{}		
+    canClassify := true
+    canWait := false
+    canTimeout := false
+    return retry.NewStrategy(
+        func() retry.StrategyInstance {
+            return &yourStrategyInstance{}        
         },
         canClassify,
         canWait,
@@ -125,20 +125,20 @@ The strategy instance must implement the following interface:
 
 ```go
 type StrategyInstance interface {
-	// CanRetry returns an error if no more tries should be attempted.
-	// The error will be returned directly from the retry function. The
-	// passed action parameters can be used to create a meaningful error
-	// message.
-	CanRetry(wrap WrapFunc, err error, action string) error
-	// Wait returns a channel that is closed when the wait time expires. The
-	// channel can have any content, so it is provided as an interface{}.
-	// This function may return nil if it doesn't provide a wait time.
-	Wait(err error) interface{}
-	// OnWaitExpired is a hook that gives the strategy the option to return
-	// an error if its wait has expired. It will only be called if it is the
-	// first to reach its wait. If no error is returned the loop is
-	// continued. The passed action name can be incorporated into an error
-	// message.
-	OnWaitExpired(wrap WrapFunc, err error, action string) error
+    // CanRetry returns an error if no more tries should be attempted.
+    // The error will be returned directly from the retry function. The
+    // passed action parameters can be used to create a meaningful error
+    // message.
+    CanRetry(wrap WrapFunc, err error, action string) error
+    // Wait returns a channel that is closed when the wait time expires. The
+    // channel can have any content, so it is provided as an interface{}.
+    // This function may return nil if it doesn't provide a wait time.
+    Wait(err error) interface{}
+    // OnWaitExpired is a hook that gives the strategy the option to return
+    // an error if its wait has expired. It will only be called if it is the
+    // first to reach its wait. If no error is returned the loop is
+    // continued. The passed action name can be incorporated into an error
+    // message.
+    OnWaitExpired(wrap WrapFunc, err error, action string) error
 }
 ```
