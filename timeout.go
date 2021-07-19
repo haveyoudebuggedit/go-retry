@@ -25,7 +25,7 @@ type timeoutStrategy struct {
 	startTime time.Time
 }
 
-func (t *timeoutStrategy) Continue(wrap WrapFunc, err error, action string) error {
+func (t *timeoutStrategy) CanRetry(wrap WrapFunc, err error, action string) error {
 	if t.startTime.Add(t.duration).Before(time.Now()) {
 		return wrap(
 			err,

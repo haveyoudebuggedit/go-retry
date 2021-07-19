@@ -20,9 +20,9 @@ type Strategy interface {
 // StrategyInstance is the instantiation of a strategy. It may have internal state to keep track of things like how much
 // time has been elapsed since it was created.
 type StrategyInstance interface {
-	// Continue returns an error if no more tries should be attempted. The error will be returned directly from the
+	// CanRetry returns an error if no more tries should be attempted. The error will be returned directly from the
 	// retry function. The passed action parameters can be used to create a meaningful error message.
-	Continue(wrap WrapFunc, err error, action string) error
+	CanRetry(wrap WrapFunc, err error, action string) error
 	// Wait returns a channel that is closed when the wait time expires. The channel can have any content, so it is
 	// provided as an interface{}. This function may return nil if it doesn't provide a wait time.
 	Wait(err error) interface{}

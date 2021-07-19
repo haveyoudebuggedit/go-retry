@@ -33,6 +33,6 @@ func (e *exponentialBackoff) OnWaitExpired(_ WrapFunc, _ error, _ string) error 
 	return nil
 }
 
-func (e *exponentialBackoff) Continue(_ WrapFunc, _ error, _ string) error {
+func (e *exponentialBackoff) CanRetry(_ WrapFunc, _ error, _ string) error {
 	return nil
 }

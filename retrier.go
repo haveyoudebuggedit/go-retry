@@ -13,9 +13,7 @@ import (
 // - Maximum tries set to 30.
 var Retry = New(
 	log.Printf,
-	func(err error, format string, args ...interface{}) error {
-		return fmt.Errorf(fmt.Sprintf("%s (%s)", format, "%w"), append(args, err))
-	},
+	nil,
 	nil,
 	[]Strategy{ExponentialBackoff(2)},
 	[]Strategy{MaxTries(30)},
@@ -33,6 +31,14 @@ func New(
 	defaultBackoff []Strategy,
 	defaultTimeout []Strategy,
 ) Retrier {
+	if logger == nil {
+		logger = func(_ string, _ ...interface{}) {}
+	}
+	if wrapFunc == nil {
+		wrapFunc = func(err error, format string, args ...interface{}) error {
+			return fmt.Errorf(fmt.Sprintf("%s (%s)", format, "%w"), append(args, err))
+		}
+	}
 	return &retrier{
 		logger: logger,
 		wrapFunc: wrapFunc,
@@ -70,22 +76,16 @@ func (r *retrier) Retry(action string, call func() error, strategies ...Strategy
 		retries[i] = factory.Get()
 	}
 
-	if r.logger != nil {
-		r.logger("%s%s...", strings.ToUpper(action[:1]), action[1:])
-	}
+	r.logger("%s%s...", strings.ToUpper(action[:1]), action[1:])
 	for {
 		err := call()
 		if err == nil {
-			if r.logger != nil {
-				r.logger("Completed %s.", action)
-			}
+			r.logger("Completed %s.", action)
 			return nil
 		}
 		for _, retry := range retries {
-			if err := retry.Continue(r.wrapFunc, err, action); err != nil {
-				if r.logger != nil {
-					r.logger("Error while %s. (%v)", action, err)
-				}
+			if err := retry.CanRetry(r.wrapFunc, err, action); err != nil {
+				r.logger("Error while %s. (%v)", action, err)
 				return err
 			}
 		}
@@ -101,19 +101,15 @@ func (r *retrier) Retry(action string, call func() error, strategies ...Strategy
 			}
 		}
 		if len(chans) == 0 {
-			if r.logger != nil {
-				r.logger(
-					"No retry strategies with waiting function specified for %s.",
-					action,
-				)
-			}
+			r.logger(
+				"No retry strategies with waiting function specified for %s.",
+				action,
+			)
 			panic(fmt.Errorf("no retry strategies with waiting function specified for %s", action))
 		}
 		chosen, _, _ := reflect.Select(chans)
 		if err := retries[chosen].OnWaitExpired(r.wrapFunc, err, action); err != nil {
-			if r.logger != nil {
-				r.logger("Error while %s. (%v)", action, err)
-			}
+			r.logger("Error while %s. (%v)", action, err)
 			return err
 		}
 	}

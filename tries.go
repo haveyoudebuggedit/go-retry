@@ -21,7 +21,7 @@ type maxTriesStrategy struct {
 	tries    uint16
 }
 
-func (m *maxTriesStrategy) Continue(wrap WrapFunc, err error, action string) error {
+func (m *maxTriesStrategy) CanRetry(wrap WrapFunc, err error, action string) error {
 	m.tries++
 	if m.tries > m.maxTries {
 		return wrap(

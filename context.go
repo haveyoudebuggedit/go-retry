@@ -4,9 +4,9 @@ import (
 	"context"
 )
 
-// ContextStrategy provides a timeout based on a context in the ctx parameter. If the context is canceled the
+// Context provides a timeout based on a context in the ctx parameter. If the context is canceled the
 // retry loop is aborted.
-func ContextStrategy(ctx context.Context) Strategy {
+func Context(ctx context.Context) Strategy {
 	return NewStrategy(
 		func() StrategyInstance {
 			return &contextStrategy{
@@ -23,7 +23,7 @@ type contextStrategy struct {
 	ctx context.Context
 }
 
-func (c *contextStrategy) Continue(wrap WrapFunc, _ error, _ string) error {
+func (c *contextStrategy) CanRetry(wrap WrapFunc, _ error, _ string) error {
 	return nil
 }
 
